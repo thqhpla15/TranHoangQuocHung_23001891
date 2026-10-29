@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt vé xem phim</title>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 30px 15px;
+            margin: 0;
+        }
+
+        .card {
+            max-width: 550px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px #cccccc;
+        }
+
+        h2 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .radio-group label,
+        .checkbox-group label {
+            display: inline-block;
+            margin-right: 15px;
+            font-weight: normal;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity button {
+            width: 40px;
+            height: 38px;
+            font-size: 18px;
+        }
+
+        .quantity input {
+            width: 80px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+
+        button:disabled {
+            background-color: #aaaaaa;
+            cursor: not-allowed;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .buttons button {
+            flex: 1;
+        }
+
+        .reset {
+            background-color: #6c757d;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #dc3545;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .confirmation {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .confirmation h3 {
+            color: green;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div id="app">
+    <div class="card">
+        <h2>ĐẶT VÉ XEM PHIM</h2>
+
+        <form @submit.prevent="datVe">
+            <div class="form-group">
+                <label>Họ tên khách hàng:</label>
+                <input
+                        type="text"
+                        v-model.trim="hoTen"
+                        placeholder="Nhập họ tên của bạn"
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Chọn suất chiếu:</label>
+                <select v-model="suatChieu">
+                    <option value="09:00">09:00</option>
+                    <option value="14:00">14:00</option>
+                    <option value="19:00">19:00</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Loại vé:</label>
+
+                <div class="radio-group">
+                    <label>
+                        <input
+                                type="radio"
+                                value="thuong"
+                                v-model="loaiVe"
+                        >
+                        Vé thường (Giá: 70.000đ)
+                    </label>
+
+                    <label>
+                        <input
+                                type="radio"
+                                value="vip"
+                                v-model="loaiVe"
+                        >
+                        Vé VIP (Giá: 100.000đ)
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Số lượng vé:</label>
+
+                <div class="quantity">
+                    <button
+                            type="button"
+                            @click="giamSoLuong"
+                            :disabled="soLuong <= 1"
+                    >
+                        -
+                    </button>
+
+                    <input
+                            type="number"
+                            v-model.number="soLuong"
+                            min="1"
+                            max="10"
+                            step="1"
+                            required
+                    >
+
+                    <button
+                            type="button"
+                            @click="tangSoLuong"
+                            :disabled="soLuong >= 10"
+                    >
+                        +
+                    </button>
+                </div>
+
+                <small>Chỉ được đặt từ 1 đến 10 vé.</small>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <label>
+                    <input type="checkbox" v-model="combo">
+                    Combo bắp nước (Giá: 45.000đ)
+                </label>
+            </div>
+
+            <div class="total">
+                Tổng tiền: {{ tongTien.toLocaleString('vi-VN') }} đồng
+            </div>
+
+            <div class="buttons">
+                <button
+                        type="submit"
+                        :disabled="!hopLe"
+                >
+                    Đặt vé
+                </button>
+
+                <button
+                        type="button"
+                        class="reset"
+                        @click="datLai"
+                >
+                    Đặt lại
+                </button>
+            </div>
+        </form>
+
+        <div v-if="daDatVe" class="confirmation">
+            <h3>Đặt vé thành công!</h3>
+
+            <p>Khách hàng: {{ thongTin.hoTen }}</p>
+            <p>Suất chiếu: {{ thongTin.suatChieu }}</p>
+            <p>Loại vé: {{ thongTin.loaiVe }}</p>
+            <p>Số lượng: {{ thongTin.soLuong }} vé</p>
+            <p>Combo bắp nước: {{ thongTin.combo ? 'Có' : 'Không' }}</p>
+
+            <p>
+                Tổng thanh toán:
+                <strong>
+                    {{ thongTin.tongTien.toLocaleString('vi-VN') }} đồng
+                </strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                hoTen: "",
+                suatChieu: "09:00",
+                loaiVe: "thuong",
+                soLuong: 1,
+                combo: false,
+                daDatVe: false,
+                thongTin: {}
+            };
+        },
+
+        computed: {
+            giaVe() {
+                return this.loaiVe === "vip" ? 100000 : 70000;
+            },
+
+            tongTien() {
+                return this.giaVe * this.soLuong
+                    + (this.combo ? 45000 : 0);
+            },
+
+            hopLe() {
+                return this.hoTen.trim() !== ""
+                    && Number.isInteger(this.soLuong)
+                    && this.soLuong >= 1
+                    && this.soLuong <= 10;
+            }
+        },
+
+        methods: {
+            tangSoLuong() {
+                if (this.soLuong < 10) {
+                    this.soLuong++;
+                }
+            },
+
+            giamSoLuong() {
+                if (this.soLuong > 1) {
+                    this.soLuong--;
+                }
+            },
+
+            datVe() {
+                if (!this.hopLe) {
+                    return;
+                }
+
+                this.thongTin = {
+                    hoTen: this.hoTen,
+                    suatChieu: this.suatChieu,
+                    loaiVe: this.loaiVe === "vip" ? "VIP" : "Thường",
+                    soLuong: this.soLuong,
+                    combo: this.combo,
+                    tongTien: this.tongTien
+                };
+
+                this.daDatVe = true;
+            },
+
+            datLai() {
+                this.hoTen = "";
+                this.suatChieu = "09:00";
+                this.loaiVe = "thuong";
+                this.soLuong = 1;
+                this.combo = false;
+                this.daDatVe = false;
+                this.thongTin = {};
+            }
+        }
+    });
+
+    app.mount("#app");
+</script>
+</body>
+</html>

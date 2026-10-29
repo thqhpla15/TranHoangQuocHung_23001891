@@ -1,0 +1,186 @@
+<!-- Bài tập 1 -->
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thẻ thông tin sinh viên</title>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      padding: 30px 15px;
+      margin: 0;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px #cccccc;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+    }
+
+    .info {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 20px;
+      text-align: left;
+    }
+
+    .info p {
+      margin: 14px 0;
+      line-height: 1.5;
+    }
+
+    .gioi {
+      color: green;
+      font-weight: bold;
+    }
+
+    .kha {
+      color: blue;
+      font-weight: bold;
+    }
+
+    .trung-binh {
+      color: orange;
+      font-weight: bold;
+    }
+
+    .chua-dat {
+      color: red;
+      font-weight: bold;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .introduction {
+      margin-top: 20px;
+      overflow-wrap: anywhere;
+    }
+
+    .introduction p {
+      line-height: 1.6;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px;
+      }
+
+      .info {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div id="app">
+  <div class="card">
+    <img
+            :src="sinhVien.anh"
+            :alt="'Ảnh đại diện của ' + sinhVien.hoTen"
+            class="avatar"
+    >
+
+    <h2>{{ sinhVien.hoTen }}</h2>
+
+    <div class="info">
+      <p>Mã sinh viên: {{ sinhVien.maSV }}</p>
+
+      <p>Lớp: <span v-text="sinhVien.lop"></span></p>
+
+      <p>Điểm trung bình: {{ sinhVien.diemTB }}</p>
+
+      <p>
+        Xếp loại:
+        <span
+                :class="{
+                            'gioi': sinhVien.diemTB >= 8,
+                            'kha': sinhVien.diemTB >= 6.5 && sinhVien.diemTB < 8,
+                            'trung-binh': sinhVien.diemTB >= 5 && sinhVien.diemTB < 6.5,
+                            'chua-dat': sinhVien.diemTB < 5
+                        }"
+        >
+                        <span v-if="sinhVien.diemTB >= 8">Giỏi</span>
+                        <span v-else-if="sinhVien.diemTB >= 6.5">Khá</span>
+                        <span v-else-if="sinhVien.diemTB >= 5">Trung bình</span>
+                        <span v-else>Chưa đạt</span>
+                    </span>
+      </p>
+
+      <p v-if="sinhVien.dangHoc">
+        Trạng thái: Đang học
+      </p>
+
+      <p v-else>
+        Trạng thái: Đã nghỉ
+      </p>
+    </div>
+
+    <button @click="hienThi = !hienThi">
+      {{ hienThi ? 'Ẩn giới thiệu' : 'Hiện giới thiệu' }}
+    </button>
+
+    <div v-show="hienThi" class="introduction">
+      <h3>Giới thiệu</h3>
+      <p>{{ sinhVien.gioiThieu }}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const app = Vue.createApp({
+    data() {
+      return {
+        sinhVien: {
+          maSV: "23001891",
+          hoTen: "Trần Hoàng Quốc Hưng",
+          lop: "K68A4",
+          anh: "https://placehold.co/120x120",
+          diemTB: 7.5,
+          dangHoc: true,
+          gioiThieu: "Tôi là sinh viên trường Đại học Khoa học Tự nhiên."
+        },
+        hienThi: true
+      };
+    }
+  });
+
+  app.mount("#app");
+</script>
+</body>
+</html>
